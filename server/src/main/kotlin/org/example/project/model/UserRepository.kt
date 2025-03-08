@@ -1,8 +1,10 @@
 package org.example.project.model
+import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.timestamp
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
@@ -10,30 +12,22 @@ import java.time.LocalDateTime
 
 
 class UserRepository {
+    private fun resultRowToUser(row: ResultRow): Users = Users(
+        email = row[User.email],
+        password = row[User.passwordHash],
+        roles = row[User.role]
+    )
+
     fun getAllUsers(): List<Users> = transaction {
         println("Fetching all users...")
-        val result = User.selectAll().map {
-            println("User: ${it[User.email]}")
-            Users(
-                email = it[User.email],
-                password = it[User.passwordHash],
-                roles = it[User.role]
-            )
-        }
+        val result = User.selectAll().map(::resultRowToUser)
         println("Fetched ${result.size} users")
         result
     }
 
     fun getUserByEmail(email: String): Users? = transaction {
-        User.select(User.email eq email) //
-            .map {
-                Users(
-                    email = it[User.email],
-                    password = it[User.passwordHash],
-                    roles = it[User.role] // Correct way
-
-                )
-            }
+        User.select(User.email eq email)
+            .map(::resultRowToUser)
             .singleOrNull()
     }
 
@@ -49,7 +43,7 @@ class UserRepository {
                 it[email] = user.email
                 it[passwordHash] = hashedPassword
                 it[role] = user.roles
-                it[createdAt] = timestamp("created_at")
+                it[createdAt] = currentTime
             }
             true
         } else {
@@ -57,9 +51,7 @@ class UserRepository {
         }
     }
 
-
     fun deleteUser(email: String): Boolean = transaction {
-        User.deleteWhere { User.email eq email } > 0 //
+        User.deleteWhere { User.email eq email } > 0
     }
-    }
-
+}
