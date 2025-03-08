@@ -1,10 +1,37 @@
 package org.example.project
 
-import androidx.compose.material3.*
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import org.mindrot.jbcrypt.BCrypt
+
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -13,18 +40,39 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+<<<<<<< HEAD
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+=======
+import io.ktor.client.HttpClient
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+>>>>>>> f6ff2fd48419a5c5bcadc947467a6dcf4db2971b
 import kotlinx.coroutines.launch
 import org.example.project.network.UserApi
 import org.example.project.network.createHttpClient
 
+import org.example.project.network.UserApi
+
 @Composable
+<<<<<<< HEAD
 fun App() {
     MaterialTheme {
         val httpClient = remember { createHttpClient() }
         val userApi = remember { UserApi(httpClient) }
+=======
+fun App(client: HttpClient, userApi: UserApi) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var rememberMe by remember { mutableStateOf(false) }
+    var loginResponse by remember { mutableStateOf<String?>(null) }
+>>>>>>> f6ff2fd48419a5c5bcadc947467a6dcf4db2971b
 
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
@@ -114,6 +162,7 @@ fun App() {
                                     return@launch
                                 }
 
+<<<<<<< HEAD
                                 try {
                                     val user = userApi.getUserByEmail(email)
                                     if (user != null && user.password == password) {
@@ -133,6 +182,21 @@ fun App() {
                     ) {
                         Text(text = "Log In", fontSize = 18.sp)
                     }
+=======
+                Button(
+                    onClick = {
+                        scope.launch {
+                            loginResponse = login(userApi, email, password)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(text = "Log In", fontSize = 18.sp)
+                }
+>>>>>>> f6ff2fd48419a5c5bcadc947467a6dcf4db2971b
 
                     loginResponse?.let {
                         Spacer(modifier = Modifier.height(12.dp))
@@ -143,3 +207,17 @@ fun App() {
         }
     }
 }
+<<<<<<< HEAD
+=======
+
+// ✅ Correct Login Function Using UserApi
+suspend fun login(userApi: UserApi, email: String, password: String): String {
+    val user = userApi.getUserByEmail(email)
+    return if (user != null && BCrypt.checkpw(password, user.password)) {
+        "Login successful!"
+    } else {
+        "Login failed: Invalid email or password"
+    }
+}
+
+>>>>>>> f6ff2fd48419a5c5bcadc947467a6dcf4db2971b
